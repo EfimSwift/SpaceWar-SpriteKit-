@@ -16,6 +16,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var spaceShip: SKSpriteNode!
     var score = 0
     var scoreLabel: SKLabelNode!
+    var spaceBackground: SKSpriteNode!
     
     override func didMove(to view: SKView) {
         
@@ -24,6 +25,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         // scene size
         scene?.size = UIScreen.main.bounds.size
+        
+        let width = UIScreen.main.bounds.size.width
+        let height = UIScreen.main.bounds.size.height
         
         spaceShip = SKSpriteNode(imageNamed: "spaceShip")
         spaceShip.xScale = 0.7
@@ -34,9 +38,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         spaceShip.physicsBody?.collisionBitMask = asteroidCategory
         spaceShip.physicsBody?.contactTestBitMask = asteroidCategory
         
-        let background = SKSpriteNode(imageNamed: "background")
-        background.size = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height )
-        addChild(background)
+        spaceBackground = SKSpriteNode(imageNamed: "background")
+        spaceBackground.size = CGSize(width: width + 50, height: height + 50 )
+        addChild(spaceBackground)
         
         addChild(spaceShip)
         
@@ -56,7 +60,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scoreLabel.position = CGPoint(x: frame.size.width / scoreLabel.frame.size.width, y: 300)
         addChild(scoreLabel)
         
-        background.zPosition = 0
+        spaceBackground.zPosition = 0
         spaceShip.zPosition = 1
         scoreLabel.zPosition = 3
     }
@@ -69,8 +73,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let speed: CGFloat = 500
             let time = timeToTravelDistance(distance: distance, speed: speed)
             let moveAction = SKAction.move(to: touchLocation, duration: time)
+            moveAction.timingMode = SKActionTimingMode.easeInEaseOut
             
             spaceShip.run(moveAction)
+            
+            let bgMoveAction = SKAction.move(to: CGPoint(x: -touchLocation.x / 100, y: -touchLocation.y / 100), duration: time)
+            
+            spaceBackground.run(bgMoveAction)
         }
     }
     
@@ -100,6 +109,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         asteroid.physicsBody?.categoryBitMask = asteroidCategory
         asteroid.physicsBody?.collisionBitMask = spaceShipCategory | asteroidCategory
         asteroid.physicsBody?.contactTestBitMask = spaceShipCategory
+        
+        let asteroidSpeedX: CGFloat = 150
+        asteroid.physicsBody?.angularVelocity = CGFloat(drand48() * 2 - 1) * 3
+        asteroid.physicsBody?.velocity.dx = CGFloat(drand48() * 2 - 1) * asteroidSpeedX
         
         return asteroid
     }

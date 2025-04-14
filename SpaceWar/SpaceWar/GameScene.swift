@@ -17,6 +17,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var score = 0
     var scoreLabel: SKLabelNode!
     var spaceBackground: SKSpriteNode!
+    var asteroidLayer: SKNode!
     
     override func didMove(to view: SKView) {
         
@@ -38,15 +39,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         spaceShip.physicsBody?.collisionBitMask = asteroidCategory
         spaceShip.physicsBody?.contactTestBitMask = asteroidCategory
         
+        let colorAction = SKAction.colorize(with: .red, colorBlendFactor: 1, duration: 1)
+        let colorAction2 = SKAction.colorize(with: .white, colorBlendFactor: 0, duration: 1)
+        
+        let colorSequenceAnimation = SKAction.sequence([colorAction, colorAction2])
+        let colorActionRepeat = SKAction.repeatForever(colorSequenceAnimation)
+        
+        spaceShip.run(colorActionRepeat)
         spaceBackground = SKSpriteNode(imageNamed: "background")
         spaceBackground.size = CGSize(width: width + 50, height: height + 50 )
         addChild(spaceBackground)
         
         addChild(spaceShip)
         
+        asteroidLayer = SKNode()
+        asteroidLayer.zPosition = 2
+        addChild(asteroidLayer)
+        
         let asteroidCreate = SKAction.run {
             let asteroid = self.createAsteroid()
-            self.addChild(asteroid)
+            self.asteroidLayer.addChild(asteroid)
             asteroid.zPosition = 2
         }
         let asteroidPerSecond: Double = 1
@@ -54,7 +66,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let asteroidSequenceAction = SKAction.sequence([asteroidCreate, asteroidCreationDelay])
         let asteroidRunAction = SKAction.repeatForever(asteroidSequenceAction)
         
-        run(asteroidRunAction)
+        self.asteroidLayer.run(asteroidRunAction)
         
         scoreLabel = SKLabelNode(text: "Score \(score)")
         scoreLabel.position = CGPoint(x: frame.size.width / scoreLabel.frame.size.width, y: 300)
@@ -80,6 +92,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let bgMoveAction = SKAction.move(to: CGPoint(x: -touchLocation.x / 100, y: -touchLocation.y / 100), duration: time)
             
             spaceBackground.run(bgMoveAction)
+            
+            self.asteroidLayer.isPaused = !self.asteroidLayer.isPaused
+            if asteroidLayer.isPaused == true {
+                physicsWorld.speed = 0
+            } else {
+                physicsWorld.speed = 1
+            }
         }
     }
     
@@ -125,7 +144,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func didSimulatePhysics() {
-        enumerateChildNodes(withName: "asteroid") { asteroid, stop in
+        asteroidLayer.enumerateChildNodes(withName: "asteroid") { asteroid, stop in
             let hightScreen = UIScreen.main.bounds.height
             if asteroid.position.y < -hightScreen {
                 asteroid.removeFromParent()

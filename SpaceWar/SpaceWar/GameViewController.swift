@@ -10,6 +10,7 @@ import SpriteKit
 import GameplayKit
 
 class GameViewController: UIViewController {
+    var gameScene: GameScene!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,8 +18,9 @@ class GameViewController: UIViewController {
         if let view = self.view as! SKView? {
             // Load the SKScene from 'GameScene.sks'
             if let scene = SKScene(fileNamed: "GameScene") {
-                // Set the scale mode to scale to fit the window
                 scene.scaleMode = .aspectFill
+                
+                gameScene = scene as? GameScene
                 
                 // Present the scene
                 view.presentScene(scene)
@@ -39,6 +41,9 @@ class GameViewController: UIViewController {
         }
     }
 
+    @IBAction func pauseButtonPressed(_ sender: UIButton) {
+        gameScene.pauseButtonPressed(sender: sender)
+    }
     override var prefersStatusBarHidden: Bool {
         return true
     }

@@ -18,13 +18,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var scoreLabel: SKLabelNode!
     var spaceBackground: SKSpriteNode!
     var asteroidLayer: SKNode!
-    
+    var starsLayer: SKNode!
     var gameIsPaused: Bool = false
     
     func pauseTheGame() {
         gameIsPaused = true
         self.asteroidLayer.isPaused = true
         physicsWorld.speed = 0
+        starsLayer.isPaused = true
     }
     
     func pauseButtonPressed(sender: AnyObject) {
@@ -39,6 +40,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         gameIsPaused = false
         self.asteroidLayer.isPaused = false
         physicsWorld.speed = 1
+        starsLayer.isPaused = false
     }
     
     func resetTheGame() {
@@ -81,6 +83,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         spaceBackground.size = CGSize(width: width + 50, height: height + 50 )
         addChild(spaceBackground)
         
+        //Stars
+        let starPath = Bundle.main.path(forResource: "Stars", ofType: "sks")
+        let starsEmitter = NSKeyedUnarchiver.unarchiveObject(withFile: starPath!) as? SKEmitterNode
+        starsEmitter?.zPosition = 1
+        starsEmitter?.position = CGPoint(x: frame.midX, y: frame.height / 2)
+        starsEmitter?.particlePositionRange.dx = frame.width
+        starsEmitter?.advanceSimulationTime(10)
+        
+        starsLayer = SKNode()
+        starsEmitter?.zPosition = 1
+        addChild(starsLayer)
+        
+        starsLayer.addChild(starsEmitter!)
         addChild(spaceShip)
         
         asteroidLayer = SKNode()
@@ -109,6 +124,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if !gameIsPaused {
             if let touch = touches.first {
                 let touchLocation = touch.location(in: self)
                 
@@ -123,6 +139,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 let bgMoveAction = SKAction.move(to: CGPoint(x: -touchLocation.x / 100, y: -touchLocation.y / 100), duration: time)
                 
                 spaceBackground.run(bgMoveAction)
+            }
         }
     }
     

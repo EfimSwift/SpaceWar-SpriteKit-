@@ -10,10 +10,14 @@ import SpriteKit
 import GameplayKit
 
 class GameViewController: UIViewController {
+    
     var gameScene: GameScene!
+    var pauseViewController: UIViewController!
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        pauseViewController = storyboard?.instantiateViewController(withIdentifier: "PauseViewController")
         
         if let view = self.view as! SKView? {
             // Load the SKScene from 'GameScene.sks'
@@ -43,7 +47,10 @@ class GameViewController: UIViewController {
 
     @IBAction func pauseButtonPressed(_ sender: UIButton) {
         gameScene.pauseButtonPressed(sender: sender)
+        
+        present(pauseViewController, animated: true, completion: nil)
     }
+    
     override var prefersStatusBarHidden: Bool {
         return true
     }

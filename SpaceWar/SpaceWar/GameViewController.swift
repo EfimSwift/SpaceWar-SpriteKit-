@@ -49,18 +49,24 @@ class GameViewController: UIViewController {
     }
 
     @IBAction func pauseButtonPressed(_ sender: UIButton) {
-        gameScene.pauseButtonPressed(sender: sender)
-        showVC(pauseViewController)
+        gameScene.pauseTheGame()
+        showPauseScreen(pauseViewController)
     }
     
     override var prefersStatusBarHidden: Bool {
         return true
     }
     
-    func showVC(_ viewController: PauseViewController) {
+    func showPauseScreen(_ viewController: PauseViewController) {
         addChild(viewController)
         view.addSubview(viewController.view)
         viewController.view.frame = view.bounds
+        
+        viewController.view.alpha = 0
+        
+        UIView.animate(withDuration: 0.5) {
+            viewController.view.alpha = 1
+        }
         
     }
     
@@ -68,11 +74,22 @@ class GameViewController: UIViewController {
         viewController.willMove(toParent: nil)
         viewController.removeFromParent()
         viewController.view.removeFromSuperview()
+        
+        viewController.view.alpha = 1
+        
+        UIView.animate(withDuration: 0.5, animations: {
+            viewController.view.alpha = 0
+        }) { (completed) in
+            viewController.view.removeFromSuperview()
+        }
+            
+        
     }
 }
 
 extension GameViewController: PauseVCDelegate {
     func pauseViewControllerPlayButton(_ viewController: PauseViewController) {
         hidePauseScreen(viewController: pauseViewController)
+        gameScene.unpauseTheGame()
     }
 }

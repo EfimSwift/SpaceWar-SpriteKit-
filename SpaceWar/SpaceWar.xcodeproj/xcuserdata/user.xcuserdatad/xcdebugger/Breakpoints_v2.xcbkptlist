@@ -14,8 +14,8 @@
             filePath = "SpaceWar/GameScene.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "193"
-            endingLineNumber = "193"
+            startingLineNumber = "209"
+            endingLineNumber = "209"
             landmarkName = "update(_:)"
             landmarkType = "7">
          </BreakpointContent>
